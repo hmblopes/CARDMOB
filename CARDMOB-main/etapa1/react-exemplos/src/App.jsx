@@ -6,10 +6,12 @@ import { useState } from 'react';
  
  import Counter from './components/Counter';
  import Photo from './components/Photo';
+ import Album from './components/album';
  
  function App() {
    const [count, setCount] = useState(0);
    const [photos, setPhotos] = useState([]);
+   const [albumId, setAlbumId] = useState(1);
  
    const fetchPhotos = async () => {
      try {
@@ -54,7 +56,7 @@ import { useState } from 'react';
      <>
        <Counter title="Contando..." />
        <Counter initial="100" />
-       <article>
+       {/* <article>
          <h1>Album da API</h1>
          {photos.map( (photo) => (
            // <article key={photo.id}>
@@ -63,7 +65,15 @@ import { useState } from 'react';
            // </article>
            <Photo photo={photo} />
          ))}
-       </article>
+       </article> */}
+       <div>
+         <button onClick={() => setAlbumId(1)}>Album #1</button>
+         <button onClick={() => setAlbumId(2)}>Album #2</button>
+         <button onClick={() => setAlbumId(3)}>Album #3</button>
+         <button onClick={() => setAlbumId(4)}>Album #4</button>
+       </div>
+ 
+       <Album albumId={albumId} />
      </>
  }
 }
