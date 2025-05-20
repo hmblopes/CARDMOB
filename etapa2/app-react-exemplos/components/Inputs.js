@@ -73,6 +73,5 @@ const styles = StyleSheet.create({
     },
     submitButtonText: {
         color: 'white',
-        backgroundColor: 'purple',
     }
 });
