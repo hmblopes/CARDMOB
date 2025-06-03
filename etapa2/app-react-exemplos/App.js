@@ -30,7 +30,7 @@ export default function App() {
     fetchCompras();
   }, []);
 
-  const addCompra = async () => {
+  const adicionarCompra = async () => {
     if (item.trim() === '' || quantidade.trim() === '') return;
 
     try {
@@ -49,7 +49,7 @@ export default function App() {
     }
   };
 
-  const updateCompra = async (id) => {
+  const atualizarCompra = async (id) => {
     try {
       const response = await fetch(`${baseUrl}/compras/${id}`, {
         method: 'PUT',
@@ -70,7 +70,7 @@ export default function App() {
   const deletarCompra = async (id) => {
     Alert.alert(
       'Excluir',
-      'Deseja realmente excluir este item?',
+      'Deseja excluir este item?',
       [
         { text: 'Cancelar', style: 'cancel' },
         {
@@ -92,14 +92,18 @@ export default function App() {
     if (item.id !== editId) {
       return (
         <View style={styles.item}>
-          <Text>{item.item} - Quantidade: {item.quantidade}</Text>
+          <Text>{item.item} - Quantidade: {item.quantidade} und(s)</Text>
           <View style={styles.buttons}>
-            <Button title="Edit" onPress={() => {
+            <Button title="Edit"
+            color="#6959CD" 
+            onPress={() => {
               setEditId(item.id);
               setEditItem(item.item);
               setEditQuantidade(String(item.quantidade));
             }} />
-            <Button title="Delete" onPress={() => deletarCompra(item.id)} />
+            <Button title="Delete" 
+            onPress={() => deletarCompra(item.id)} 
+            color="#6959CD"/>
           </View>
         </View>
       );
@@ -119,7 +123,9 @@ export default function App() {
             onChangeText={setEditQuantidade}
             keyboardType="numeric"
           />
-          <Button title="Salvar" onPress={() => updateCompra(item.id)} />
+          <Button title="Salvar" 
+          onPress={() => atualizarCompra(item.id)} 
+          color="#6959CD"/>
         </View>
       );
     }
@@ -140,7 +146,9 @@ export default function App() {
         onChangeText={setQuantidade}
         keyboardType="numeric"
       />
-      <Button title="Add" onPress={addCompra} />
+      <Button title="Add" 
+      onPress={adicionarCompra} 
+      color="#6959CD"/>
       <FlatList
         data={compras}
         keyExtractor={(item) => item.id.toString()}

@@ -12,13 +12,13 @@
   "compras": [
     {
       "item": "Chocolate",
-      "quantidade": 7,
-      "id": "29dc"
+      "quantidade": 8,
+      "id": "0303"
     },
     {
-      "id": "0303",
-      "item": "Morango",
-      "quantidade": 5
+      "id": "72c2",
+      "item": "Queijo",
+      "quantidade": 3
     }
   ]
 }
