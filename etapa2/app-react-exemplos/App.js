@@ -1,77 +1,128 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
+import React, { useState, useEffect } from 'react'; // novo: useEffect
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Button, Image, TextInput, Alert, FlatList, useEffect } from 'react-native';
+import { StyleSheet, Text, View, Button, Image, TextInput, FlatList, Alert } from 'react-native'; // novo: Alert
 
-// indicar endereço do backend.
-const BASE_URL = 'http://10.81.205.14:3000';
+import ScrollViewExample from './components/ScrollViewExamples';
+// Indicar o endereço do backend.
+const BASE_URL = 'http://10.81.205.50:3000'; // novo
 
 export default function App() {
-  const [counter, setCounter] = useState(0);
+ 
+  // Excluir tudo que tem relação com counter, pois não usar.
   /// CRUD em memória
   const [items, setItems] = useState([]);
   const [text, setText] = useState('');
   const [editItemId, setEditItemId] = useState(null);
   const [editItemText, setEditItemText] = useState('');
-  //loading... efeito
-  const [loading, setLoading] = useState(false);
-  //busca
-  const fecthItems = async () => {
+  // loading ... efeito de carregando...
+  const [loading, setLoading] = useState(false); // novo
+
+  // Buscar tudo.
+  const fetchItems = async () => {
     setLoading(true);
     try {
-        const response = await fetch(`${BASE_URL}/items`);
-        const data = await response.json();
-        console.log(JSON.stringify(data)); // debug
-        setItems(data);
+      // executa o que precisa, se der erro entra no catch.
+      const response = await fetch(`${BASE_URL}/items`);
+      const data = await response.json();
+      console.log(JSON.stringify(data)); // debug
+      setItems(data);
+
     } catch (error) {
-        console.error('Error fetching items:', error);
-    } finally {
-        setLoading(false);
+      // quando ocorre algum erro.
+      console.error('Error fetching items:', error);
+    }
+    finally {
+      setLoading(false);
     }
   }
 
   useEffect(() => {
-    fecthItems();
+    fetchItems();
   }, [])
 
-  const incrementCounter = () => {
-    setCounter(counter + 1);
-  };
-
-  const decrementCounter = () => {
-    setCounter(counter - 1);
-  };
-
-   // CREATE
-  const addItem = () => {
+  // CREATE
+  const addItem = async () => {
     if (text.trim() === '') {
       return;
     }
-    const newItem = {
-      id: Math.random().toString(),
-      text: text.trim()
+    try {
+      const response = await fetch(`${BASE_URL}/items`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({text: text.trim()}),
+      });
+      if (response.ok) {
+        await fetchItems();
+        setText('');
+      }
+      else {
+        console.error('Failed to add item:', response.status);
+      }
+    } 
+    catch (error) {
+      console.error('Error adding item:', error);
     }
-    setItems([...items, newItem]);
-    setText('');
-    console.log(items);
+
   }
 
   // UPDATE
-  const updateItem = (id) => {
-    setItems( items.map( item => {
-      if (item.id === id) {
-        return { ...item, text: editItemText}
+  const updateItem = async (id) => {
+    try {
+      const response = await fetch(`${BASE_URL}/items/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({text: editItemText}),
+      });
+      if (response.ok) {
+        await fetchItems();
+        setEditItemId(null);
+        setEditItemText('');
       }
-      return item;
-      })
-    );
-    setEditItemId(null);
-    setEditItemText('');
+      else {
+        console.error('Failed to update item:', response.status);
+      }
+    }
+    catch (error) {
+      console.error('Error updating item:', error)
+    }
   }
 
   // DELETE
-  const deleteItem = (id) => {
-    setItems(items.filter(item => item.id !== id));
-  }
+  const deleteItem = async (id) => {
+    Alert.alert(
+      'Confirm Delete',
+      'Are you sure you want to delete this item ?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Delete',
+          onPress: async () => {
+            try {
+              const response = await fetch(`${BASE_URL}/items/${id}`, {
+                method: 'DELETE'
+              });
+              if (response.ok) {
+                await fetchItems();
+              }
+              else {
+                console.error('Failed to delete item:', response.status);
+              }
+            }
+            catch (error) {
+              console.error('Error deleting item:', error);
+            }
+          }, 
+        }
+      ],
+      { cancelable: true }
+    );
+  };
 
   // READ -> um único item e/ou lista de itens
   const renderItem = ({item}) => {
@@ -104,6 +155,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      <ScrollViewExample />
       <TextInput 
         style={styles.input}
         value={text}
@@ -139,6 +191,8 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: {
+    flexDirection: 'column',
+    justifyContent: 'space-between',
     flex: 1,
     padding: 20,
     marginTop: 60,
@@ -162,6 +216,8 @@ const styles = StyleSheet.create({
   item: {
     flexDirection: 'row',
     alignItems: 'center',
+    height: 600,
+    marginTop: 150,
     justifyContent: 'space-between',
     marginBottom: 10,
     padding: 10,
